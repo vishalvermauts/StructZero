@@ -31,7 +31,12 @@ StructZero sits upstream of any agentic IDE. Instead of prompting the IDE direct
 
 ## 🎬 Demo Video
 
-[![StructZero Demo](docs/screenshots/01_dashboard.png)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+Check out the full workflow in action:
+
+<video src="docs/structzero_narrative_demo.mp4" controls="controls" muted="muted" style="max-height:640px;">
+</video>
+
+*(If the video above doesn't load, you can [download/view it here](docs/structzero_narrative_demo.mp4))*
 
 > **The core demo:** Prompt Antigravity directly → shallow scaffold. Send same prompt through StructZero debate → detailed blueprint → feed to Antigravity → production-grade implementation.
 
@@ -175,3 +180,6 @@ Add the following to your MCP client configuration (e.g., Antigravity, Cursor, C
 ## 📜 License
 
 MIT — Free to use, modify, and distribute.
+
+## Local Vector Memory Bank
+StructZero supports a fully local Vector Memory Bank powered by Ollama. By using the lightweight `nomic-embed-text` model, semantic embeddings are generated locally on your machine at zero cost. This ensures data privacy and fast, offline vector similarity searches for architectural drafts and system rules, without relying on external APIs.
