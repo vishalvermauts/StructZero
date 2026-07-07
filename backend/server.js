@@ -323,7 +323,11 @@ fastify.post('/api/adk/production-check', async (request, reply) => {
   const adkScriptPath = path.join(__dirname, 'adk_advisor.py');
 
   return new Promise((resolve) => {
-    const py = spawn('python', [adkScriptPath, encoded, geminiKey]);
+    // Pass API key via environment variable (not argv) to prevent exposure
+    // in process listings (ps aux / /proc/[pid]/cmdline)
+    const py = spawn('python', [adkScriptPath, encoded], {
+      env: { ...process.env, STRUCTZERO_GEMINI_KEY: geminiKey }
+    });
     let output = '';
     let errOutput = '';
 

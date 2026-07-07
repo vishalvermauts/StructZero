@@ -1,16 +1,18 @@
 """
-Helix ADK Production Readiness Advisor
-=======================================
+StructZero ADK Production Readiness Advisor
+============================================
 This module uses Google's Agent Development Kit (ADK) to run a structured
 production readiness review on a generated architecture blueprint.
 
-It is invoked as a subprocess by the Helix Node.js backend when a blueprint
+It is invoked as a subprocess by the StructZero Node.js backend when a blueprint
 is finalized by the 3-way debate engine, adding a Google-native ADK agent
 as the final verification pass in the pipeline.
 
 Usage (from Node.js backend):
-    python adk_advisor.py "<base64_encoded_blueprint>" "<gemini_api_key>"
+    STRUCTZERO_GEMINI_KEY=<key> python adk_advisor.py "<base64_encoded_blueprint>"
 
+    The API key is passed via environment variable (not argv) to prevent
+    exposure in process listings (ps aux / /proc/[pid]/cmdline).
 Output: JSON string written to stdout
     {
         "ready": true/false,
@@ -77,7 +79,7 @@ def create_production_advisor_agent(api_key: str) -> LlmAgent:
     os.environ["GOOGLE_API_KEY"] = api_key
 
     agent = LlmAgent(
-        name="helix_production_advisor",
+        name="structzero_production_advisor",
         model="gemini-2.5-flash",
         description=(
             "A specialized production readiness reviewer that evaluates "
@@ -98,14 +100,14 @@ async def run_production_check(blueprint: str, api_key: str) -> dict:
 
     session_service = InMemorySessionService()
     session = await session_service.create_session(
-        app_name="helix",
+        app_name="structzero",
         user_id="system",
         session_id="prod-check-session"
     )
 
     runner = Runner(
         agent=agent,
-        app_name="helix",
+        app_name="structzero",
         session_service=session_service
     )
 
@@ -146,10 +148,16 @@ async def run_production_check(blueprint: str, api_key: str) -> dict:
 
 
 def main():
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 2:
         print(json.dumps({
-            "error": "Usage: python adk_advisor.py <base64_blueprint> <gemini_api_key>"
+            "error": "Usage: STRUCTZERO_GEMINI_KEY=<key> python adk_advisor.py <base64_blueprint>"
         }))
+        sys.exit(1)
+
+    # API key from environment variable (safer than argv — not visible in ps aux)
+    api_key = os.environ.get("STRUCTZERO_GEMINI_KEY", "")
+    if not api_key:
+        print(json.dumps({"error": "STRUCTZERO_GEMINI_KEY environment variable not set."}))
         sys.exit(1)
 
     # Decode blueprint from base64 (safe for shell transport)
@@ -158,8 +166,6 @@ def main():
     except Exception as e:
         print(json.dumps({"error": f"Failed to decode blueprint: {str(e)}"}))
         sys.exit(1)
-
-    api_key = sys.argv[2]
 
     # Run the ADK agent
     try:

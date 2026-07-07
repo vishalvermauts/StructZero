@@ -1,4 +1,4 @@
-﻿# 🔷 StructZero — The Multi-Agent Planning Layer for Agentic IDEs
+# 🔷 StructZero — The Multi-Agent Planning Layer for Agentic IDEs
 
 > **Built on MCP · Powered by 4 AI Agents · Designed for Antigravity IDE**
 
@@ -71,7 +71,7 @@ Connect StructZero to any MCP-compatible IDE in 2 minutes:
 }
 ```
 
-### Available MCP Tools (8 total)
+### Available MCP Tools (11 total)
 
 | Tool | What It Does |
 |------|-------------|
@@ -82,7 +82,10 @@ Connect StructZero to any MCP-compatible IDE in 2 minutes:
 | `search_memory` | Semantic memory search across sessions |
 | `search_skills` | Query the reusable blueprint skills library |
 | `troubleshoot_error` | AI-powered error resolution with codebase context |
-| `switch_active_user` | Switch user profile for multi-developer teams |
+| `switch_active_user` | Switch active user profile |
+| `create_or_update_profile` | Create or update rules for a user profile |
+| `list_profiles` | List all available profiles and the active one |
+| `delete_profile` | Delete a specific user profile and its rules |
 
 **Resource:** `workspace://context` — Returns the full active blueprint + memory bank as a single Markdown document, injected into every IDE AI conversation.
 
@@ -92,12 +95,12 @@ Connect StructZero to any MCP-compatible IDE in 2 minutes:
 
 ### Prerequisites
 - Node.js 18+
-- Python 3.9+
+- Python 3.10+
 - API Keys: Gemini (required), Anthropic Claude (required), DeepSeek (required)
 
 ### 1. Clone & Install Backend
 ```bash
-git clone https://github.com/YOUR_USERNAME/StructZero-mcp-architect.git
+git clone https://github.com/vishalvermauts/StructZero.git
 cd StructZero-mcp-architect/backend
 npm install
 pip install google-adk   # For the ADK Production Advisor agent
@@ -183,7 +186,7 @@ Every blueprint passes through a background pipeline that uses Gemini to extract
 | Concept | Implementation | Where |
 |---------|---------------|-------|
 | **Multi-Agent System (ADK)** | Google ADK `LlmAgent` production gate + LangGraph 3-way debate | Code + Video |
-| **MCP Server** | 8 tools, 1 resource, full stdio transport | Code |
+| **MCP Server** | 11 tools, 1 resource, full stdio transport | Code |
 | **Antigravity** | Primary dev tool AND primary use case | Video |
 | **Security Features** | SAST, ACL guardrails, circuit breakers, budget cap | Code + Video |
 | **Deployability** | `node server.js` + `npm run dev` — two commands | Video |
@@ -226,7 +229,7 @@ StructZero was built using Antigravity IDE as the primary coding assistant. Seve
 
 ## ⚠️ Security Note for Judges
 
-No API keys are hardcoded. All secrets are loaded from `.env` (excluded by `.gitignore`). The `.env.example` file contains only placeholder values. The ADK advisor receives the Gemini key at runtime via secure argument passing, not environment variable embedding.
+No API keys are hardcoded. All secrets are loaded from `.env` (excluded by `.gitignore`). The `.env.example` file contains only placeholder values. The ADK advisor receives the Gemini key via a dedicated environment variable (`STRUCTZERO_GEMINI_KEY`) injected into the subprocess — never as a command-line argument (which would be visible in process listings).
 
 ---
 
