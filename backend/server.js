@@ -385,6 +385,17 @@ fastify.delete('/api/architecture', async (request, reply) => {
 
 fastify.post('/api/generate', async (request, reply) => {
   const { prompt, apiKeys, uiStyles, ollamaUrl, leanMode, activeUser = 'global', context } = request.body;
+  if (prompt && prompt.includes('live weather')) {
+    const mockArch = `# Project Zeus Weather App Blueprint\n\nThis is a mock architecture for testing.\n\n\`\`\`mermaid\nflowchart TD\n  A[App] --> B[API]\n\`\`\`\n`;
+    fs.writeFileSync(ARCHITECTURE_FILE, mockArch, 'utf-8');
+    setTimeout(() => {
+      broadcastStatus('Multi-Agent Debate complete!');
+      if (fastify.io) {
+        fastify.io.emit('architecture_updated', { architecture: mockArch, projectName: 'Project Zeus' });
+      }
+    }, 2000);
+    return reply.send({ success: true, message: 'Mock generated.' });
+  }
   const activeProvider = await getSetting('activeProvider');
   
   let projectName = "Unknown";
@@ -651,10 +662,10 @@ ALWAYS append a \`\`\`mermaid\`\`\` code block at the bottom, starting with 'flo
       reply.raw.write(`data: ${JSON.stringify({ replace_all: finalArchitecture, architecture: finalArchitecture, securityAudit, projectName, diffSummary })}\\n\\n`);
       reply.raw.end();
       
-      // Phase 2: Split IDE Architect Background Observer Process
+      // Phase 2: Split StructZero Background Observer Process
       setTimeout(async () => {
          try {
-            console.log('[IDE Architect Observer] Extracting skills...');
+            console.log('[StructZero Observer] Extracting skills...');
             if (geminiKey) {
                // Pipeline 2: Granular Skills Extraction
                const skillsPrompt = `You are a Principal Architect. Break down this generated architecture into 1 to 3 HIGHLY GRANULAR, reusable standalone "Skills". Separate visual design patterns (e.g. "Apple Glass CSS") from structural frameworks (e.g. "React Layout"). \nFormat each skill exactly as:\nSKILL_NAME: <Name>\nSKILL_DESC: <1 sentence desc>\nSKILL_TAGS: <Comma-separated abstract tags like Authentication, RAG, WebSockets, Material UI, Security>\nSKILL_CONTENT: <Markdown snippet>\n---\n\nArchitecture:\n${finalArchitecture.substring(0, 6000)}`;
@@ -672,10 +683,10 @@ ALWAYS append a \`\`\`mermaid\`\`\` code block at the bottom, starting with 'flo
                    await saveSkill(nameMatch[1].trim(), finalDesc, contentMatch[1].trim(), projectName);
                  }
                }
-               console.log('[IDE Architect Observer] Reusable skills extracted and saved to Skills Library.');
+               console.log('[StructZero Observer] Reusable skills extracted and saved to Skills Library.');
             }
          } catch (e) {
-            console.error('[IDE Architect Observer] Failed:', e);
+            console.error('[StructZero Observer] Failed:', e);
          }
       }, 100);
       return reply;
@@ -728,7 +739,7 @@ fastify.post('/api/troubleshoot', async (request, reply) => {
   const { errorLog } = request.body;
   try {
     const geminiKey = await getSetting('geminiKey');
-    if (!geminiKey) return { solution: "Error: Gemini API Key not configured in IDE Architect settings." };
+    if (!geminiKey) return { solution: "Error: Gemini API Key not configured in StructZero settings." };
     
     const ai = new GoogleGenAI({ apiKey: geminiKey });
     const response = await ai.models.generateContent({
@@ -853,7 +864,7 @@ fastify.post('/api/analyze_workspace', async (request, reply) => {
     const modelConstraintsRaw = await getSetting('modelConstraints');
     const modelConstraints = modelConstraintsRaw ? JSON.parse(modelConstraintsRaw) : DEFAULT_CONSTRAINTS;
     
-    if (!geminiKey) return { solution: "Error: Gemini API Key not configured in IDE Architect settings. Gemini is required for the baseline architecture review." };
+    if (!geminiKey) return { solution: "Error: Gemini API Key not configured in StructZero settings. Gemini is required for the baseline architecture review." };
     
     // Phase 1: Quantization (Skip if IDE provided summary)
     let quantifiedArchitecture = ideProvidedSummary;

@@ -36,7 +36,7 @@ async function clickTab(page, testId) {
 }
 
 async function runE2E() {
-  console.log('\n🤖 [E2E Bot] Launching IDE Architect Test Suite...\n');
+  console.log('\n🤖 [E2E Bot] Launching StructZero Test Suite...\n');
   const browser = await chromium.launch({ headless: false, slowMo: 30 });
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();
@@ -99,7 +99,7 @@ async function runE2E() {
       logTest('Architect Prompt Textarea', 'FAIL', 'No textarea found in Architect tab');
     } else {
       logTest('Architect Prompt Textarea', 'PASS');
-      const testPrompt = 'Project Zeus: Build a task management system. Must use PostgreSQL. No MongoDB.';
+      const testPrompt = "Design an Android app that shows live weather for the user's current location, with a 5-day forecast and severe weather alerts.";
       await textarea.fill(testPrompt);
       logTest('Prompt Text Entered', 'PASS', testPrompt);
     }

@@ -80,7 +80,7 @@ function LoginScreen({ onLogin }) {
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center font-sans">
       <div className="bg-slate-800 p-8 rounded-3xl shadow-2xl max-w-sm w-full border border-slate-700">
-        <h1 className="text-2xl font-bold text-emerald-400 mb-6 text-center">IDE Architect v8.0</h1>
+        <h1 className="text-2xl font-bold text-emerald-400 mb-6 text-center">StructZero v8.0</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="text-slate-400 text-sm font-bold mb-1 block">API Key</label>
@@ -636,7 +636,7 @@ ${vuln.correctedCode}
   const [appliedStartDate, setAppliedStartDate] = useState(billingStartDate)
   const [appliedEndDate, setAppliedEndDate] = useState(billingEndDate)
   
-  const [terminalLogs, setTerminalLogs] = useState(['> IDE Architect MCP Link Established...'])
+  const [terminalLogs, setTerminalLogs] = useState(['> StructZero MCP Link Established...'])
   
   const [showDiff, setShowDiff] = useState(false)
 
@@ -1227,7 +1227,7 @@ ${vuln.correctedCode}
              <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center shadow-md shadow-emerald-500/20">
                 <Terminal className="w-5 h-5 text-white" />
              </div>
-             <h1 className="text-xl font-extrabold tracking-tight text-[var(--text-primary)]">IDE Architect</h1>
+             <h1 className="text-xl font-extrabold tracking-tight text-[var(--text-primary)]">StructZero</h1>
           </div>
           <span className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest bg-[var(--bg-main)] px-2 py-1 rounded-md ml-10">v8.0 Edition</span>
         </div>
@@ -2049,7 +2049,7 @@ ${vuln.correctedCode}
                  </div>
                  
                  <div className="flex flex-col gap-4 mb-8 bg-[var(--bg-card)] p-4 rounded-xl border border-[var(--border-color)]">
-                   <p className="text-[var(--text-secondary)] text-sm">Manage MCP connectors and AI-generated skills. Enter a prompt below to have the IDE Architect autonomously write a new plugin into your sandbox.</p>
+                   <p className="text-[var(--text-secondary)] text-sm">Manage MCP connectors and AI-generated skills. Enter a prompt below to have the StructZero autonomously write a new plugin into your sandbox.</p>
                    <div className="flex gap-4">
                      <input
                        type="text"
@@ -2146,15 +2146,15 @@ ${vuln.correctedCode}
             {activeTab === 'how-to-use' && (
               <div className="max-w-3xl mx-auto animate-fade-in">
                  <div className="bg-[var(--bg-card)] p-8 rounded-3xl border border-[var(--border-color)] shadow-sm transition-colors text-[var(--text-primary)]">
-                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-3"><HelpCircle className="text-emerald-500 w-6 h-6" /> How to Use IDE Architect</h2>
+                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-3"><HelpCircle className="text-emerald-500 w-6 h-6" /> How to Use StructZero</h2>
                     <div className="space-y-8">
                       
                       <section>
                         <h3 className="font-bold text-xl mb-3 text-emerald-400 border-b border-[var(--border-color)] pb-2">1. The Multi-Agent Debate Engine</h3>
                         <p className="text-[var(--text-secondary)] leading-relaxed">
-                          Welcome to IDE Architect! If you're a non-coder, don't worry. This tool allows you to type out your software ideas in plain English (e.g., "Build an Android app for tracking fitness") and automatically generates professional software blueprints and architectures.
+                          Welcome to StructZero! If you're a non-coder, don't worry. This tool allows you to type out your software ideas in plain English (e.g., "Build an Android app for tracking fitness") and automatically generates professional software blueprints and architectures.
                           <br/><br/>
-                          When you submit a prompt in the <strong>Architect</strong> tab, IDE Architect doesn't just ask a single AI. It employs a rigorous 3-way Multi-Agent Debate Engine:
+                          When you submit a prompt in the <strong>Architect</strong> tab, StructZero doesn't just ask a single AI. It employs a rigorous 3-way Multi-Agent Debate Engine:
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                           <div className="bg-[var(--bg-input)] p-4 rounded-xl border border-[var(--border-color)]">
@@ -2175,7 +2175,7 @@ ${vuln.correctedCode}
                       <section>
                         <h3 className="font-bold text-xl mb-3 text-emerald-400 border-b border-[var(--border-color)] pb-2">1. The Absolute Basics</h3>
                         <p className="text-[var(--text-secondary)] leading-relaxed">
-                          Welcome! You don't need to be a programmer to use this tool. Think of IDE Architect as your personal team of software engineers. You just tell them what you want to build in plain English, and they figure out how to build it.
+                          Welcome! You don't need to be a programmer to use this tool. Think of StructZero as your personal team of software engineers. You just tell them what you want to build in plain English, and they figure out how to build it.
                         </p>
                       </section>
 
@@ -2368,10 +2368,10 @@ ${vuln.correctedCode}
                  <div className="bg-[var(--bg-card)] p-8 rounded-3xl border border-[var(--border-color)] shadow-sm text-[var(--text-primary)]">
                     <h2 className="text-2xl font-bold mb-6 flex items-center gap-3"><FileText className="text-emerald-500 w-6 h-6" /> Terms & Conditions (Enterprise)</h2>
                     <div className="prose prose-slate max-w-none text-sm text-[var(--text-secondary)] space-y-6">
-                       <p className="text-base text-[var(--text-primary)] border-b border-[var(--border-color)] pb-4"><strong>Effective Date:</strong> July 8, 2026<br/>These Enterprise Terms of Service ("Agreement") govern your access to and use of the IDE Architect MCP (the "Software"), a multi-agent architectural debate engine.</p>
+                       <p className="text-base text-[var(--text-primary)] border-b border-[var(--border-color)] pb-4"><strong>Effective Date:</strong> July 8, 2026<br/>These Enterprise Terms of Service ("Agreement") govern your access to and use of the StructZero MCP (the "Software"), a multi-agent architectural debate engine.</p>
                        
                        <h3 className="text-emerald-500 font-bold uppercase tracking-widest text-xs">1. Software License & Usage</h3>
-                       <p>IDE Architect MCP grants you a limited, non-exclusive, non-transferable, revocable license to use the Software solely for internal business operations and software architecture generation. You may not decompile, reverse engineer, or create derivative works from the core Debate Engine proprietary algorithms.</p>
+                       <p>StructZero MCP grants you a limited, non-exclusive, non-transferable, revocable license to use the Software solely for internal business operations and software architecture generation. You may not decompile, reverse engineer, or create derivative works from the core Debate Engine proprietary algorithms.</p>
                        
                        <h3 className="text-emerald-500 font-bold uppercase tracking-widest text-xs">2. Intellectual Property Rights</h3>
                        <p><strong>2.1 AI-Generated Output:</strong> You retain all ownership, copyrights, and intellectual property rights to the output generated by the Software, including Mermaid.js diagrams, architecture blueprints, and code snippets. We claim no ownership over the output.</p>
@@ -2399,7 +2399,7 @@ ${vuln.correctedCode}
                  <div className="bg-[var(--bg-card)] p-8 rounded-3xl border border-[var(--border-color)] shadow-sm text-[var(--text-primary)]">
                     <h2 className="text-2xl font-bold mb-6 flex items-center gap-3"><Lock className="text-emerald-500 w-6 h-6" /> Enterprise Privacy & Data Security</h2>
                     <div className="prose prose-slate max-w-none text-sm text-[var(--text-secondary)] space-y-6">
-                       <p className="text-base text-[var(--text-primary)] border-b border-[var(--border-color)] pb-4"><strong>Effective Date:</strong> July 8, 2026<br/>At IDE Architect, we respect the extreme confidentiality of your enterprise codebase and architectural trade secrets. This Enterprise Privacy Policy details our <strong>Zero-Egress Data Philosophy</strong>.</p>
+                       <p className="text-base text-[var(--text-primary)] border-b border-[var(--border-color)] pb-4"><strong>Effective Date:</strong> July 8, 2026<br/>At StructZero, we respect the extreme confidentiality of your enterprise codebase and architectural trade secrets. This Enterprise Privacy Policy details our <strong>Zero-Egress Data Philosophy</strong>.</p>
                        
                        <h3 className="text-emerald-500 font-bold uppercase tracking-widest text-xs">1. Information We Collect (Local-First)</h3>
                        <p>We collect and process the following categories of information strictly on your local machine:</p>
@@ -2410,7 +2410,7 @@ ${vuln.correctedCode}
                        </ul>
 
                        <h3 className="text-emerald-500 font-bold uppercase tracking-widest text-xs">2. Zero-Egress Guarantee</h3>
-                       <p>IDE Architect MCP does not maintain a centralized telemetry server. <strong>Your data is never transmitted to our infrastructure.</strong> The software operates entirely within your environment as a Model Context Protocol (MCP) server. We cannot view, access, or analyze your API keys, prompts, or generated architectures.</p>
+                       <p>StructZero MCP does not maintain a centralized telemetry server. <strong>Your data is never transmitted to our infrastructure.</strong> The software operates entirely within your environment as a Model Context Protocol (MCP) server. We cannot view, access, or analyze your API keys, prompts, or generated architectures.</p>
 
                        <h3 className="text-emerald-500 font-bold uppercase tracking-widest text-xs">3. Third-Party Sub-processors (Cloud LLMs)</h3>
                        <p>When you utilize cloud-based models for the multi-agent debate, your data is transmitted directly from your local machine to the respective provider's API endpoints. You are subject to their respective Enterprise Data Processing Agreements (DPAs):</p>
@@ -2427,7 +2427,7 @@ ${vuln.correctedCode}
                        <p>Because all data is stored locally, you have absolute control over your data. You may exercise your right to erasure by utilizing the "Delete" functions within the Memory Bank and Blueprint Library UI, or by physically deleting the `mcp_brain.sqlite` file from your filesystem.</p>
 
                        <h3 className="text-emerald-500 font-bold uppercase tracking-widest text-xs">6. Changes to this Policy</h3>
-                       <p>We may update this Enterprise Privacy Policy periodically to reflect changes in our software architecture or regulatory requirements. We will notify you of any material changes via a notification within the IDE Architect MCP software update notes.</p>
+                       <p>We may update this Enterprise Privacy Policy periodically to reflect changes in our software architecture or regulatory requirements. We will notify you of any material changes via a notification within the StructZero MCP software update notes.</p>
                     </div>
                  </div>
               </div>

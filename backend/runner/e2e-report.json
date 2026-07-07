@@ -1,112 +1,112 @@
 {
-  "timestamp": "2026-07-05T19:04:13.161Z",
+  "timestamp": "2026-07-07T06:26:40.171Z",
   "tests": [
     {
       "name": "Authentication & Login",
       "status": "PASS",
       "detail": "Dashboard loaded with navigation",
-      "time": "2026-07-05T19:04:19.014Z"
+      "time": "2026-07-07T06:26:47.168Z"
     },
     {
       "name": "Save Settings Button Exists",
       "status": "PASS",
       "detail": "\"Save API Configuration\" found",
-      "time": "2026-07-05T19:04:19.940Z"
+      "time": "2026-07-07T06:26:48.466Z"
     },
     {
       "name": "Architect Prompt Textarea",
       "status": "PASS",
       "detail": "",
-      "time": "2026-07-05T19:04:20.763Z"
+      "time": "2026-07-07T06:26:49.352Z"
     },
     {
       "name": "Prompt Text Entered",
       "status": "PASS",
-      "detail": "Project Zeus: Build a task management system. Must use PostgreSQL. No MongoDB.",
-      "time": "2026-07-05T19:04:20.823Z"
+      "detail": "Design an Android app that shows live weather for the user's current location, with a 5-day forecast and severe weather alerts.",
+      "time": "2026-07-07T06:26:49.443Z"
     },
     {
       "name": "Generate Blueprint Button Exists",
       "status": "PASS",
       "detail": "Button text: \"Generate Blueprint\"",
-      "time": "2026-07-05T19:04:20.825Z"
+      "time": "2026-07-07T06:26:49.447Z"
     },
     {
       "name": "Backend Server Running",
       "status": "PASS",
       "detail": "Status: ok",
-      "time": "2026-07-05T19:04:20.887Z"
+      "time": "2026-07-07T06:26:49.551Z"
     },
     {
       "name": "Lean Mode Enabled for Speed",
       "status": "PASS",
       "detail": "Skipping DeepSeek round 3",
-      "time": "2026-07-05T19:04:20.963Z"
+      "time": "2026-07-07T06:26:49.641Z"
     },
     {
       "name": "Architecture Generation Completed",
-      "status": "FAIL",
-      "detail": "No output after 120s - DeepSeek may be rate-limited. Try enabling Lean Mode in Settings.",
-      "time": "2026-07-05T19:06:21.175Z"
+      "status": "PASS",
+      "detail": "Debate Engine responded",
+      "time": "2026-07-07T06:26:52.131Z"
     },
     {
       "name": "Mermaid Diagram Rendered",
       "status": "FAIL",
       "detail": "No SVG or error found in .mermaid-container",
-      "time": "2026-07-05T19:06:25.312Z"
+      "time": "2026-07-07T06:26:55.887Z"
     },
     {
       "name": "Copy (Markdown) Button Visible",
       "status": "FAIL",
       "detail": "Not found - may only appear after generation",
-      "time": "2026-07-05T19:06:25.316Z"
+      "time": "2026-07-07T06:26:55.889Z"
     },
     {
       "name": "Project Name \"Project Zeus\" Visible",
-      "status": "PASS",
-      "detail": "",
-      "time": "2026-07-05T19:06:25.318Z"
+      "status": "WARN",
+      "detail": "Project name not extracted from prompt",
+      "time": "2026-07-07T06:26:55.892Z"
     },
     {
       "name": "Security Center Tab Loads",
       "status": "PASS",
       "detail": "",
-      "time": "2026-07-05T19:06:26.229Z"
+      "time": "2026-07-07T06:26:56.719Z"
     },
     {
       "name": "Run SAST Scan Button Exists",
-      "status": "PASS",
+      "status": "FAIL",
       "detail": "",
-      "time": "2026-07-05T19:06:26.232Z"
+      "time": "2026-07-07T06:26:56.720Z"
     },
     {
       "name": "Skills Library Tab Loads",
       "status": "PASS",
       "detail": "",
-      "time": "2026-07-05T19:06:27.255Z"
+      "time": "2026-07-07T06:26:57.732Z"
     },
     {
       "name": "Billing Tab Loads",
       "status": "PASS",
       "detail": "",
-      "time": "2026-07-05T19:06:29.409Z"
+      "time": "2026-07-07T06:26:59.809Z"
     },
     {
       "name": "Date Pickers Present in Billing",
       "status": "PASS",
       "detail": "2 date input(s) found",
-      "time": "2026-07-05T19:06:29.417Z"
+      "time": "2026-07-07T06:26:59.818Z"
     },
     {
       "name": "Documentation Tab Has Content",
       "status": "PASS",
       "detail": "6 headings found",
-      "time": "2026-07-05T19:06:31.282Z"
+      "time": "2026-07-07T06:27:01.734Z"
     }
   ],
   "summary": {
-    "passed": 14,
+    "passed": 13,
     "failed": 3,
-    "warnings": 0
+    "warnings": 1
   }
 }

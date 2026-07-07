@@ -37,7 +37,7 @@ const walkSync = (dir, filelist = []) => {
 };
 
 const server = new Server({
-  name: "ide-architect-mcp",
+  name: "structzero-mcp",
   version: "3.0.0",
 }, {
   capabilities: {
@@ -391,7 +391,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("IDE Architect MCP Server running on stdio");
+  console.error("StructZero MCP Server running on stdio");
 }
 
 main().catch(console.error);

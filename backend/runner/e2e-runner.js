@@ -28,7 +28,7 @@ async function runTest() {
     console.log(JSON.stringify({ status: 'Running', message: `Navigating to ${targetUrl}` }));
     await page.goto(targetUrl, { waitUntil: 'networkidle' });
     
-    // Test basic tab navigation on standard IDE Architect / generated apps
+    // Test basic tab navigation on standard StructZero / generated apps
     // This is a generic heuristic: we look for common navigation elements.
     console.log(JSON.stringify({ status: 'Running', message: 'Looking for navigation elements...' }));
     

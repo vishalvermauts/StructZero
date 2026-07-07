@@ -25,5 +25,5 @@ app.post("/message", async (req, res) => {
 
 const PORT = 3002;
 app.listen(PORT, () => {
-  console.log(`IDE Architect MCP Server running on SSE at http://localhost:${PORT}/sse`);
+  console.log(`StructZero MCP Server running on SSE at http://localhost:${PORT}/sse`);
 });

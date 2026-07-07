@@ -10,7 +10,7 @@ async function run() {
   const planContent = fs.readFileSync(planPath, 'utf8');
 
   const promptText = `
-You are the AI brain behind IDE Architect MCP. We are redesigning the Vector Memory and Blueprint Library logic.
+You are the AI brain behind StructZero MCP. We are redesigning the Vector Memory and Blueprint Library logic.
 Here is the implementation plan:
 ${planContent}
 
