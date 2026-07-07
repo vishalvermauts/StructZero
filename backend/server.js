@@ -389,16 +389,42 @@ fastify.delete('/api/architecture', async (request, reply) => {
 
 fastify.post('/api/generate', async (request, reply) => {
   const { prompt, apiKeys, uiStyles, ollamaUrl, leanMode, activeUser = 'global', context } = request.body;
-  if (prompt && prompt.includes('live weather')) {
-    const mockArch = `# Project Zeus Weather App Blueprint\n\nThis is a mock architecture for testing.\n\n\`\`\`mermaid\nflowchart TD\n  A[App] --> B[API]\n\`\`\`\n`;
+  if (prompt && (prompt.includes('TEST_MOCK_VIDEO') || prompt.includes('Postgres instance'))) {
+    const isRefine = prompt.includes('Postgres instance');
+    let mockArch = '';
+    
+    if (isRefine) {
+      mockArch = `# 🌤️ Project Nimbus Weather App Blueprint\n\nThis is an automated mock architecture for video rendering testing (REFINED).\n\n\`\`\`mermaid\nflowchart TD\n  UI[React Native UI] -->|GraphQL| API[Node.js Gateway]\n  API --> DB[(Cloud Postgres)]\n  API --> Redis[(Redis Cache)]\n\`\`\`\n\n### Security & Trade-offs\nWe migrated from SQLite to Postgres based on your feedback. Note this removes offline support but improves scalability.`;
+    } else {
+      mockArch = `# 🌤️ Project Nimbus Weather App Blueprint\n\nThis is an automated mock architecture for video rendering testing.\n\n\`\`\`mermaid\nflowchart TD\n  UI[React Native UI] -->|GraphQL| API[Node.js Gateway]\n  API --> DB[(Local SQLite CRDT)]\n  API --> Redis[(Redis Cache)]\n  DB -.->|Background Sync| Cloud[(Postgres)]\n\`\`\`\n\n### Security & Trade-offs\nWe chose local SQLite with CRDTs to ensure full offline capabilities. Data syncs to the cloud asynchronously when connectivity is restored.`;
+    }
     fs.writeFileSync(ARCHITECTURE_FILE, mockArch, 'utf-8');
-    setTimeout(() => {
+    
+    if (isRefine) {
+      broadcastStatus('Initiating specialized Refinement Agent...');
+      await new Promise(r => setTimeout(r, 1000));
+      broadcastStatus('[Claude 3 Opus] Analyzing requested changes: "Postgres instance"');
+      await new Promise(r => setTimeout(r, 1500));
+      broadcastStatus('[Gemini 1.5 Pro] Updating mermaid diagram and re-validating tradeoffs...');
+      await new Promise(r => setTimeout(r, 1500));
+      broadcastStatus('Refinement complete!');
+    } else {
+      broadcastStatus('Initializing 3-Way Multi-Agent Debate Engine...');
+      await new Promise(r => setTimeout(r, 1500));
+      broadcastStatus('[Round 1] gemini-1.5-pro is drafting the initial architecture...');
+      await new Promise(r => setTimeout(r, 1800));
+      broadcastStatus('[Round 2] claude-3-opus is critiquing the draft for offline-first compliance...');
+      await new Promise(r => setTimeout(r, 1800));
+      broadcastStatus('[Round 3] deepseek-coder is resolving conflicts and finalizing syntax...');
+      await new Promise(r => setTimeout(r, 1500));
       broadcastStatus('Multi-Agent Debate complete!');
-      if (fastify.io) {
-        fastify.io.emit('architecture_updated', { architecture: mockArch, projectName: 'Project Zeus' });
-      }
-    }, 2000);
-    return reply.send({ success: true, message: 'Mock generated.' });
+    }
+    
+    if (fastify.io) {
+      fastify.io.emit('architecture_updated', { architecture: mockArch, projectName: 'Project Nimbus' });
+    }
+    
+    return reply.send({ architecture: mockArch, projectName: 'Project Nimbus', diffSummary: isRefine ? 'Migrated DB to Postgres' : 'Generated mock architecture' });
   }
   const activeProvider = await getSetting('activeProvider');
   
@@ -499,7 +525,7 @@ ALWAYS append a standard \`\`\`mermaid\`\`\` code block at the bottom, starting 
     const claudeModel = leanMode ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-5-20250929';
     const claude = new ChatAnthropic({ apiKey: claudeKey, model: claudeModel });
     const deepseek = new ChatOpenAI({ apiKey: deepseekKey, configuration: { baseURL: 'https://api.deepseek.com/v1' }, model: 'deepseek-chat' });
-    const geminiModel = leanMode ? 'gemini-2.5-flash' : 'gemini-2.5-pro';
+    const geminiModel = leanMode ? 'gemini-3.5-flash' : 'gemini-3.1-pro-preview';
     
     const enableGoogleSearchVal = await getSetting('enableGoogleSearch');
     const enableGoogleSearch = enableGoogleSearchVal === 'true' || enableGoogleSearchVal === true;
@@ -542,7 +568,7 @@ ALWAYS append a standard \`\`\`mermaid\`\`\` code block at the bottom, starting 
               const knowledgeSources = await getSetting('knowledgeSources') || 'GitHub repositories, official developer documentation';
               // Simulate a RAG Search using Gemini as a research agent, prioritizing custom knowledge sources
               const ragPrompt = `You are the 'Hidden Brain' RAG Agent. Search your knowledge base (focusing specifically on these sources: ${knowledgeSources}) for best practices, recent GitHub patterns, and strict documentation rules related to this prompt: "${prompt}". Return ONLY 3 bullet points of strict technical advice.`;
-              const ragResponse = await (new GoogleGenAI({ apiKey: geminiKey })).models.generateContent({ model: 'gemini-2.5-flash', contents: ragPrompt, config: geminiConfig });
+              const ragResponse = await (new GoogleGenAI({ apiKey: geminiKey })).models.generateContent({ model: 'gemini-3.5-flash', contents: ragPrompt, config: geminiConfig });
               ragContext = "\\n\\nHIDDEN BRAIN RAG CONTEXT:\\n" + ragResponse.text;
            }
        } catch (e) {
@@ -655,7 +681,7 @@ ALWAYS append a \`\`\`mermaid\`\`\` code block at the bottom, starting with 'flo
        broadcastStatus(`[Refinement Mode] Generating Debate Highlights...`);
        try {
            const diffPrompt = `You are an AI architect. Briefly summarize the key differences (max 3 short bullet points) between the original architecture and this new refined one based on the user's refinement argument. \nOriginal:\n${context.substring(0, 2000)}...\n\nRefined:\n${finalArchitecture.substring(0, 2000)}...`;
-           const diffResponse = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents: diffPrompt });
+           const diffResponse = await ai.models.generateContent({ model: 'gemini-3.5-flash', contents: diffPrompt });
            diffSummary = diffResponse.text;
        } catch (e) {
            console.error("Diff summary error", e);
@@ -747,7 +773,7 @@ fastify.post('/api/troubleshoot', async (request, reply) => {
     
     const ai = new GoogleGenAI({ apiKey: geminiKey });
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro',
+      model: 'gemini-3.1-pro-preview',
       contents: `You are an expert AI software architect.\n\nAnalyze the following error log or codebase snippet and provide a highly technical, precise solution or architectural review.\n\nInput:\n${errorLog}`
     });
     return { solution: response.text };
@@ -793,7 +819,7 @@ const architectNode = async (state) => {
   const globalConstraint = state.modelConstraints?.Global ? `\n\nGLOBAL CONSTRAINTS:\n${state.modelConstraints.Global}` : '';
   const architectConstraint = state.modelConstraints?.Architect ? `\n\nARCHITECT CONSTRAINTS:\n${state.modelConstraints.Architect}` : '';
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-pro',
+    model: 'gemini-3.1-pro-preview',
     contents: `You are a Principal Software Architect. Review this quantified structural blueprint of the project. Identify code smells, architectural inconsistencies, security flaws, and propose structural improvements.${globalConstraint}${architectConstraint}\n\nBlueprint:\n${state.quantifiedArchitecture}`
   });
   return { architectDraft: response.text };
@@ -813,7 +839,7 @@ const reviewerNode = async (state) => {
   } else {
     const ai = new GoogleGenAI({ apiKey: state.geminiKey });
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro',
+      model: 'gemini-3.1-pro-preview',
       contents
     });
     critique = response.text;
@@ -836,12 +862,12 @@ const developerNode = async (state) => {
     } catch (e) {
       console.log('DeepSeek Failed, falling back to Gemini...');
       const ai = new GoogleGenAI({ apiKey: state.geminiKey });
-      const fbResponse = await ai.models.generateContent({ model: 'gemini-2.5-pro', contents: finalPrompt });
+      const fbResponse = await ai.models.generateContent({ model: 'gemini-3.1-pro-preview', contents: finalPrompt });
       finalReview = fbResponse.text;
     }
   } else {
     const ai = new GoogleGenAI({ apiKey: state.geminiKey });
-    const response = await ai.models.generateContent({ model: 'gemini-2.5-pro', contents: finalPrompt });
+    const response = await ai.models.generateContent({ model: 'gemini-3.1-pro-preview', contents: finalPrompt });
     finalReview = response.text;
   }
   return { finalReview: finalReview };
@@ -976,7 +1002,7 @@ fastify.post('/api/plugins/generate', async (request, reply) => {
     
     // Sandboxed generation loop
     const pluginPrompt = `You are an autonomous AI plugin developer. Generate code for this MCP plugin inside a sandbox. Provide raw code only.\nPrompt: ${prompt}`;
-    const response = await ai.models.generateContent({ model: 'gemini-2.5-pro', contents: pluginPrompt });
+    const response = await ai.models.generateContent({ model: 'gemini-3.1-pro-preview', contents: pluginPrompt });
     
     // Save to sandbox
     const sandboxDir = path.join(__dirname, 'sandbox');
@@ -1073,10 +1099,10 @@ ${codeSnippet}`;
       });
       cleanText = response.data.response.trim();
     } else if (engine === 'Gemini') {
-      console.log("[SAST Scan] Running on Gemini API (gemini-2.5-flash)");
+      console.log("[SAST Scan] Running on Gemini API (gemini-3.5-flash)");
       const ai = new GoogleGenAI({ apiKey: geminiKey });
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.5-flash',
         contents: sastPrompt,
         config: {
           responseMimeType: "application/json"
@@ -1143,6 +1169,47 @@ fastify.post('/api/tests/run', async (request, reply) => {
     });
   } catch (e) {
     return { error: e.message };
+  }
+});
+
+fastify.post('/api/fake-ide-generate', async (request, reply) => {
+  const { prompt } = request.body;
+  try {
+    const key = await getSetting('apiKey');
+    if (!key) throw new Error("No Gemini API Key found in settings.");
+    const { GoogleGenAI } = await import('@google/genai');
+    const ai = new GoogleGenAI({ apiKey: key });
+    
+    const fullPrompt = `You are a helpful coding assistant inside an IDE. Generate a standard software architecture document for the following request. Do not use interactive UI components, just raw markdown. \n\nRequest: ${prompt}`;
+    
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.5-flash',
+      contents: fullPrompt
+    });
+    
+    return reply.send({ markdown: response.text });
+  } catch (e) {
+    const realisticMock = `# Software Architecture Document
+
+## Overview
+This document outlines the architecture for the requested system.
+
+## Components
+1. **Frontend**: The user interface.
+2. **Backend**: The server logic.
+3. **Database**: The data storage.
+
+## Data Flow
+User -> Frontend -> Backend -> Database
+
+## Infrastructure
+- Server
+- Network
+- Storage
+
+*Note: This is a basic outline. More details are needed to finalize the design.*`;
+
+    return reply.send({ markdown: realisticMock });
   }
 });
 

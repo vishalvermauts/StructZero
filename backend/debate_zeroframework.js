@@ -19,7 +19,7 @@ Instead of adopting heavy multi-agent frameworks like LangGraph or Mastra, we wi
 
   console.log("--- ROUND 1: GEMINI DRAFTS A REVIEW ---");
   const draftResponse = await ai.models.generateContent({
-    model: 'gemini-2.5-pro',
+    model: 'gemini-3.1-pro-preview',
     contents: `You are a Principal Software Architect. Review this proposed "Zero-Framework Approach" architectural upgrade for our multi-agent system.\n${proposedArchitecture}`
   });
   const geminiDraft = draftResponse.text;
@@ -27,7 +27,7 @@ Instead of adopting heavy multi-agent frameworks like LangGraph or Mastra, we wi
 
   console.log("--- ROUND 2: CLAUDE CRITIQUES AGGRESSIVELY ---");
   const claudeResponse = await ai.models.generateContent({
-    model: 'gemini-2.5-pro',
+    model: 'gemini-3.1-pro-preview',
     contents: `You are playing the role of a hyper-critical "Red Team" Reviewer (Claude). Critique this proposed "Zero-Framework Approach" aggressively, finding any missed edge cases, structural vulnerabilities, maintenance issues, or scaling concerns regarding building our own state management and checkpointing instead of using a framework:\n\nOriginal Proposal:\n${proposedArchitecture}\n\nGemini's Review:\n${geminiDraft}`
   });
   const critique = claudeResponse.text;
@@ -35,7 +35,7 @@ Instead of adopting heavy multi-agent frameworks like LangGraph or Mastra, we wi
 
   console.log("--- ROUND 3: GEMINI SYNTHESIZES (FINAL) ---");
   const finalResponse = await ai.models.generateContent({
-    model: 'gemini-2.5-pro',
+    model: 'gemini-3.1-pro-preview',
     contents: `Synthesize the original draft and the aggressive critique into a final, highly-polished architectural verdict on whether to adopt the "Zero-Framework Approach" or reconsider a framework, and what specific technical precautions must be taken if we do build it ourselves.\n\nGemini Draft:\n${geminiDraft}\n\nClaude Critique:\n${critique}`
   });
   
