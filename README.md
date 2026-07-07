@@ -33,7 +33,7 @@ StructZero sits upstream of any agentic IDE. Instead of prompting the IDE direct
 
 Check out the full workflow in action:
 
-[![StructZero Demo Video](docs/screenshots/01_dashboard.png)](https://github.com/vishalvermauts/StructZero/blob/master/docs/structzero_narrative_demo.mp4)
+[![StructZero Demo Video](https://img.youtube.com/vi/uIMM8t2ksT0/maxresdefault.jpg)](https://youtu.be/uIMM8t2ksT0)
 
 *(Click the image above to watch the full 2-minute demo video!)*
 
