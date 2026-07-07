@@ -114,7 +114,7 @@ These serve two functions:
 
 ### 1. Clone & Install Backend
 ```bash
-git clone https://github.com/YOUR_USERNAME/StructZero-mcp-architect.git
+git clone https://github.com/vishalvermauts/StructZero.git
 cd StructZero-mcp-architect/backend
 npm install
 pip install google-adk   # For the ADK Production Gatekeeper agent
