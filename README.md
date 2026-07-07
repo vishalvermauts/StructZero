@@ -18,40 +18,40 @@ StructZero is the missing planning layer between a developer's idea and their ag
 
 ## ✨ The 4-Agent Pipeline
 
-```
-User Prompt
-    │
-    ▼
-┌─────────────────────────────────────┐
-│  Agent 1: Gemini 2.5 Pro            │  ← Architect
-│  Draft blueprint + RAG from Skills  │
-└─────────────────┬───────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────┐
-│  Agent 2: Claude Sonnet             │  ← Critic
-│  Aggressively critiques the draft   │
-└─────────────────┬───────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────┐
-│  Agent 3: DeepSeek Chat             │  ← Compiler
-│  Synthesizes draft + critique       │
-└─────────────────┬───────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────┐
-│  Agent 4: Google ADK LlmAgent       │  ← Production Gatekeeper
-│  7-dimension production readiness   │
-│  review (PASS/WARN/BLOCK per area)  │
-└─────────────────┬───────────────────┘
-                  │
-                  ▼
-    Blueprint saved + broadcast
-    to all connected IDEs via MCP
+![StructZero Architecture](docs/architecture.png)
+
+```mermaid
+flowchart TD
+    A(["🖊️ User Prompt"]):::input
+
+    A --> B
+
+    B["**Agent 1 — Gemini 2.5 Pro**\nDraft blueprint + RAG from Skills Library"]:::architect
+    B --> C
+
+    C["**Agent 2 — Claude Sonnet**\nAdversarial critique of the draft"]:::critic
+    C --> D
+
+    D["**Agent 3 — DeepSeek Chat**\nSynthesises draft + critique into final blueprint"]:::compiler
+    D --> E
+
+    E["**Agent 4 — Google ADK LlmAgent**\n7-dimension production gate\nPASS · WARN · BLOCK per area"]:::gatekeeper
+
+    E --> F1
+    E --> F2
+
+    F1(["✅ Blueprint saved to Skills Library"]):::output
+    F2(["📡 Broadcast to all connected IDEs via MCP"]):::output
+
+    classDef input fill:#1e2433,stroke:#00d4aa,stroke-width:2px,color:#fff
+    classDef architect fill:#1e1b4b,stroke:#6366f1,stroke-width:2px,color:#c7d2fe
+    classDef critic fill:#2d0a0a,stroke:#f43f5e,stroke-width:2px,color:#fecdd3
+    classDef compiler fill:#1a1a00,stroke:#f59e0b,stroke-width:2px,color:#fde68a
+    classDef gatekeeper fill:#1a0a2e,stroke:#8b5cf6,stroke-width:3px,color:#ddd6fe
+    classDef output fill:#022c22,stroke:#10b981,stroke-width:2px,color:#6ee7b7
 ```
 
-If ADK finds gaps → **"Improve Blueprint"** button re-injects all WARN/BLOCK items as hard constraints → triggers new debate round → hardened blueprint.
+> If ADK finds gaps → **"Improve Blueprint"** button re-injects all WARN/BLOCK items as hard constraints → triggers new debate round → hardened blueprint.
 
 ---
 
