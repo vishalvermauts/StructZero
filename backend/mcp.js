@@ -17,6 +17,9 @@ const __dirname = path.dirname(__filename);
 const ARCHITECTURE_FILE = path.join(__dirname, "architecture.md");
 
 
+// --- DIRECTORY CRAWLER ---
+// Why: We need a lightweight way to bundle the current project's raw source code so the Debate Engine can critique it.
+// Why these exclusions: We aggressively filter out 'node_modules', '.git', and build directories because injecting dependency code into the LLM context window causes token limits to explode and distracts the agent from the core business logic.
 const walkSync = (dir, filelist = []) => {
   try {
     const files = fs.readdirSync(dir);
@@ -59,6 +62,8 @@ server.setRequestHandler(ListResourcesRequestSchema, async () => {
   };
 });
 
+// --- MCP RESOURCE ENDPOINTS ---
+// Why: By exposing a single "workspace://context" URI, the IDE client (e.g., Cursor/Antigravity) can instantly load the latest structural decisions. This bridges the gap between the Debate Engine's output and the IDE's prompt context, ensuring the IDE agent never hallucinated architectural choices.
 server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
   if (request.params.uri === "workspace://context") {
     let archContent = "No architecture plan generated yet.";
@@ -301,11 +306,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     try {
       let bundledCode = "";
       if (!ideProvidedSummary) {
+        // Why fallback: If the IDE's agent doesn't natively support full-codebase summarization, we do a raw file crawl.
         const files = walkSync(workspaceRoot);
         for (const file of files) {
           try {
             const content = fs.readFileSync(file, 'utf-8');
             bundledCode += `\n\n--- FILE: ${file.replace(workspaceRoot, '')} ---\n${content}`;
+            // Why 500k limit: We must truncate raw code injection. Node.js strings and HTTP payload limits can crash the MCP bridge, and LLM context windows degrade heavily beyond this point anyway.
             if (bundledCode.length > 500000) {
               bundledCode += "\n\n...[TRUNCATED to protect memory]...";
               break;
@@ -336,6 +343,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }, { responseType: 'text' });
       
       // Parse the response
+      // Why: The backend has two response modes to handle different LLM providers. 
+      // Cloud models (Gemini/Claude) return unary JSON objects.
+      // Local models (Ollama) stream Server-Sent Events (SSE) to prevent Node.js from running out of heap memory on huge generations.
+      // The MCP client must seamlessly bridge both formats for the IDE.
       let fullPlan = "";
       try {
         // Try parsing the entire response as a single JSON object first (Cloud Engine non-SSE fallback)

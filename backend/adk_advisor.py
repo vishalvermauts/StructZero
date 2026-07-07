@@ -74,7 +74,9 @@ ready=true only if score >= 60 and no BLOCKers exist.
 def create_production_advisor_agent(api_key: str) -> LlmAgent:
     """
     Creates a Google ADK LlmAgent configured as a Production Readiness Advisor.
-    Uses Gemini 2.5 Flash for fast, cost-efficient structured analysis.
+    Why Gemini 2.5 Flash: We use Flash here (instead of Pro or DeepSeek) because 
+    this agent performs a structured classification/extraction task (JSON checklist generation), 
+    which Flash excels at with near-instant latency and extremely low cost.
     """
     os.environ["GOOGLE_API_KEY"] = api_key
 
@@ -111,6 +113,9 @@ async def run_production_check(blueprint: str, api_key: str) -> dict:
         session_service=session_service
     )
 
+    # Why truncate to 8000 chars: Some Debate Engine outputs can be extremely long. 
+    # The ADK check primarily needs the structural components (diagrams, data models, API endpoints)
+    # which are usually defined in the first half of the blueprint. Truncating protects against token bloat.
     user_message = genai_types.Content(
         role="user",
         parts=[genai_types.Part(text=f"Please review this architecture blueprint for production readiness:\n\n{blueprint[:8000]}")]
@@ -128,7 +133,9 @@ async def run_production_check(blueprint: str, api_key: str) -> dict:
                     result_text += part.text
 
     # Parse JSON from response
-    # Strip markdown code fences if present
+    # Why manual JSON extraction: Even when explicitly instructed to output "valid JSON only", 
+    # LLMs frequently prepend/append conversational filler or wrap the JSON in ```json ... ``` markdown fences. 
+    # This strip logic ensures the Node.js backend receives a clean parseable object.
     clean = result_text.strip()
     if clean.startswith("```"):
         lines = clean.split("\n")

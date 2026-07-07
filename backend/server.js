@@ -35,6 +35,8 @@ if (!process.env.API_KEY) {
   }
 }
 
+// --- SECURITY UTILS ---
+// Why: Standard string equality checks (===) return early if a character mismatches, allowing attackers to guess API keys character-by-character via timing attacks. timingSafeEqual ensures the comparison takes a constant amount of time regardless of where the mismatch occurs.
 function timingSafeCompare(str1, str2) {
   if (typeof str1 !== 'string' || typeof str2 !== 'string') return false;
   const buf1 = Buffer.from(str1);
@@ -78,12 +80,14 @@ Keep the Mermaid diagram in sync with the final text — no orphaned nodes.`
 };
 
 // --- WALLET BUDGET CIRCUIT BREAKER ---
+// Why a hardcoded limit: AI APIs (especially GPT-4 and Claude 3 Opus) can drain balances rapidly if a script gets caught in an infinite loop. This provides an absolute floor of financial safety.
 const BUDGET_LIMIT = 5.00; // Hardcoded $5.00 daily limit for safety
 
 async function checkAndChargeBudget(estimatedCost) {
   const today = new Date().toISOString().split('T')[0];
   const spendKey = `spend:${today}`;
   
+  // Why Redis pipeline: To prevent race conditions where multiple concurrent generation requests read the same initial balance, bypassing the limit.
   const pipeline = redis.pipeline();
   const results = await pipeline.get(spendKey).exec();
   const currentSpend = parseFloat(results[0][1]) || 0;
@@ -94,7 +98,7 @@ async function checkAndChargeBudget(estimatedCost) {
 
   await redis.incrbyfloat(spendKey, estimatedCost);
   
-  // Expire at midnight
+  // Expire at midnight to automatically reset the daily bucket without a cron job
   const now = new Date();
   const midnight = new Date(now);
   midnight.setHours(24, 0, 0, 0);
@@ -135,10 +139,10 @@ const fastify = Fastify({ logger: false });
 await fastify.register(cors, { origin: '*' });
 await fastify.register(fastifySocketIo, { cors: { origin: '*' } });
 
-// P-Queue to ensure local Ollama doesn't run out of VRAM/RAM (Concurrency: 1)
+// Why P-Queue (Concurrency: 1): Local LLMs (Ollama) consume massive amounts of VRAM. If multiple requests hit the backend simultaneously, Ollama will try to load multiple models or context windows into RAM, causing catastrophic system crashes. This strictly serializes local generation requests.
 const localQueue = new PQueue({ concurrency: 1 });
 
-// Opossum Circuit Breaker for Local Ollama
+// Why Opossum Circuit Breaker: Local endpoints frequently hang or crash if the user's machine is under heavy load. Instead of the UI spinning forever, this breaker fast-fails and triggers the fallback cloud flow if Ollama becomes unresponsive or fails consecutively.
 const requestOllama = async (payload) => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s max per local gen
