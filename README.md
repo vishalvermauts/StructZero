@@ -91,7 +91,7 @@ Connect StructZero to any MCP-compatible IDE in 2 minutes:
 
 ---
 
-## 🚀 Quick Start (For Judges)
+## 🚀 Quick Start
 
 ### Prerequisites
 - Node.js 18+
@@ -227,7 +227,7 @@ StructZero was built using Antigravity IDE as the primary coding assistant. Seve
 
 ---
 
-## ⚠️ Security Note for Judges
+## ⚠️ Security Note
 
 No API keys are hardcoded. All secrets are loaded from `.env` (excluded by `.gitignore`). The `.env.example` file contains only placeholder values. The ADK advisor receives the Gemini key via a dedicated environment variable (`STRUCTZERO_GEMINI_KEY`) injected into the subprocess — never as a command-line argument (which would be visible in process listings).
 
