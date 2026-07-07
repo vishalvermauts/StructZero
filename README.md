@@ -33,7 +33,9 @@ StructZero sits upstream of any agentic IDE. Instead of prompting the IDE direct
 
 Check out the full workflow in action:
 
-https://github.com/vishalvermauts/StructZero/raw/master/docs/structzero_narrative_demo.mp4
+[![StructZero Demo Video](docs/screenshots/01_dashboard.png)](https://github.com/vishalvermauts/StructZero/blob/master/docs/structzero_narrative_demo.mp4)
+
+*(Click the image above to watch the full 2-minute demo video!)*
 
 > **The core demo:** Prompt Antigravity directly → shallow scaffold. Send same prompt through StructZero debate → detailed blueprint → feed to Antigravity → production-grade implementation.
 
