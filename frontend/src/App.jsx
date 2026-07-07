@@ -6,7 +6,9 @@ import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
 import { Settings, Play, Database, FileJson, Terminal, Activity, ShieldAlert, Copy, SplitSquareHorizontal, LayoutDashboard, MessageSquare, ChevronLeft, ChevronRight, ChevronDown, CheckCircle2, DollarSign, HelpCircle, Moon, Sun, Book, FileText, Lock, AlertTriangle, Cpu, Filter, Plug, Shield, X, Info, Plus, Trash, Maximize2, Download } from 'lucide-react'
 import Dashboard from './Dashboard'
-import MermaidDiagram from './MermaidDiagram'
+import MermaidRenderer from './components/MermaidRenderer';
+import TerminalLogViewer from './components/TerminalLogViewer';
+import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
 import Draggable from 'react-draggable'
 import MonacoEditor from '@monaco-editor/react'
 
@@ -794,6 +796,18 @@ ${vuln.correctedCode}
   }
 
   const fetchBilling = async () => {
+    // MOCK FOR DEMO VIDEO
+    if (localStorage.getItem('ide_api_key') === 'test-key') {
+      const today = new Date().toISOString().split('T')[0];
+      setBillingData([
+        { model: 'gemini-1.5-pro', latency: 450, total_tokens: 3450, cost: 0.0431, created_at: today },
+        { model: 'claude-3-opus', latency: 890, total_tokens: 4120, cost: 0.0618, created_at: today },
+        { model: 'gemini-1.5-pro', latency: 320, total_tokens: 1250, cost: 0.0156, created_at: today },
+        { model: 'claude-3-sonnet', latency: 510, total_tokens: 2100, cost: 0.0063, created_at: today }
+      ]);
+      return;
+    }
+
     try {
       const res = await fetchWithAuth('http://localhost:3001/api/observability/metrics');
       const data = await res.json();
@@ -889,6 +903,47 @@ ${vuln.correctedCode}
     if (!arch) { showToast("Generate a blueprint first!"); return; }
     setAdkLoading(true);
     setAdkResult(null);
+
+    // MOCK FOR DEMO VIDEO
+    if (localStorage.getItem('ide_api_key') === 'test-key') {
+      let step = 0;
+      const fakeAdkLogs = [
+        "> Initializing Google ADK Production Checker...",
+        "> [INFO] Scanning architecture for security vulnerabilities...",
+        "> [INFO] Evaluating data compliance...",
+        "> ADK Security: Checking HTTPS/REST encryption... PASS",
+        "> ADK Database: Evaluating SQLite for backend scalability... WARN",
+        "> [INFO] Finalizing production score...",
+        "> Google ADK Check Complete."
+      ];
+      
+      setTerminalLogs([]);
+      
+      const interval = setInterval(() => {
+        if (step < fakeAdkLogs.length) {
+          setTerminalLogs(prev => [...prev, fakeAdkLogs[step]].slice(-20));
+          step++;
+        } else {
+          clearInterval(interval);
+          setAdkResult({
+            score: 75,
+            ready: false,
+            summary: "Architecture is functional but missing critical production elements.",
+            checklist: [
+              { dimension: "Database", status: "BLOCK", note: "SQLite on Android is not scalable for the entire backend." },
+              { dimension: "Security", status: "PASS", note: "HTTPS/REST properly encrypted." }
+            ],
+            blockers: ["SQLite is not recommended for production backends."]
+          });
+          setAdkLoading(false);
+          setTimeout(() => {
+             setTerminalLogs(['> StructZero MCP Link Established...']);
+          }, 1000);
+        }
+      }, 1200);
+      return;
+    }
+
     try {
       const res = await fetchWithAuth('http://localhost:3001/api/adk/production-check', {
         method: 'POST',
@@ -937,6 +992,54 @@ ${vuln.correctedCode}
     setAppStatus('processing')
     setError(null)
     
+    // MOCK FOR DEMO VIDEO
+    if (localStorage.getItem('ide_api_key') === 'test-key') {
+      let step = 0;
+      const fakeLogs = isRefinement ? [
+        "> Initializing Refinement Agent...",
+        "> [INFO] Loading context: 'Switch the database to a Postgres instance'",
+        "> Agent A (Database): Replacing SQLite Sync with PostgreSQL backend connection.",
+        "> Agent B (Security): Reviewing TLS requirements for Postgres connections...",
+        "> [INFO] Security check passed.",
+        "> StructZero MCP: Merging new components into architecture...",
+        "> Finalizing diagram..."
+      ] : [
+        "> StructZero MCP Link Established...",
+        "> Initializing Agent Swarm...",
+        "> [INFO] Parsing requirements: Offline-first Android weather app.",
+        "> Agent A (Architect): Proposing Android App -> API Gateway -> Load Balancer.",
+        "> Agent B (Mobile): Wait, offline-first requires local storage. Add SQLite Sync.",
+        "> Agent C (Backend): Approved. We also need gRPC for internal microservices.",
+        "> Agent B (Mobile): Adding Weather Data Service and Auth Service.",
+        "> [INFO] Validating component connections...",
+        "> Agent A (Architect): Diagram generated successfully."
+      ];
+      
+      setTerminalLogs([]);
+      
+      const interval = setInterval(() => {
+        if (step < fakeLogs.length) {
+          setTerminalLogs(prev => [...prev, fakeLogs[step]].slice(-20));
+          step++;
+        } else {
+          clearInterval(interval);
+          let arch = "```mermaid\nflowchart TD\n    A[\"Mobile App (Android)\"] -->|HTTPS/REST| B(API Gateway)\n    A -->|SQLite Sync| A\n    B --> C{Load Balancer}\n    C -->|gRPC| D[Auth Service]\n    C -->|gRPC| E[Weather Data Service]\n    D --> F[(\"User DB Postgres\")]\n    E --> G[(\"Weather DB PostgreSQL\")]\n    E -->|Fetch| H[External Weather API]\n```";
+          if (isRefinement) {
+             arch = "```mermaid\nflowchart TD\n    A[\"Mobile App (Android)\"] -->|HTTPS/REST| B(API Gateway)\n    B --> C{Load Balancer}\n    C -->|gRPC| D[Auth Service]\n    C -->|gRPC| E[Weather Data Service]\n    D --> F[(\"User DB Postgres\")]\n    E --> G[(\"Weather DB PostgreSQL\")]\n    E -->|Fetch| H[External Weather API]\n    F -.-> I[Security Audit Passed]\n```";
+          }
+          const nextVersionIndex = currentVersionIndex + 1;
+          const newTree = [...versionTree.slice(0, nextVersionIndex), arch];
+          setVersionTree(newTree);
+          setCurrentVersionIndex(nextVersionIndex);
+          setAppStatus('normal');
+          setIsGenerating(false);
+          setLastPrompt(generationPrompt);
+          setTerminalLogs(['> StructZero MCP Link Established...']);
+        }
+      }, 1000); // Push a log every 1s
+      return;
+    }
+
     try {
       const endpoint = 'http://localhost:3001/api/generate';
       const bodyPayload = { 
@@ -1161,7 +1264,7 @@ ${vuln.correctedCode}
                </div>
                {/* Modal Content */}
                <div className="flex-1 overflow-auto rounded-2xl border border-[var(--border-color)] bg-[var(--bg-input)] p-8 flex items-center justify-center min-h-0 [&_svg]:w-full [&_svg]:h-auto [&_svg]:max-w-[95%] [&_svg]:max-h-[90%] select-none">
-                  <MermaidDiagram chart={mermaidCode} />
+                  <ReactErrorBoundary fallback={<div className="text-red-500 p-4 border border-red-500/30 bg-red-500/10 rounded-lg text-sm">Mermaid crashed!</div>}><MermaidRenderer chart={mermaidCode} /></ReactErrorBoundary>
                </div>
             </div>
          </div>
@@ -1335,49 +1438,12 @@ ${vuln.correctedCode}
                      >
                        {isGenerating && versionTree.length === 0 ? 'Architecting...' : 'Generate Blueprint'}
                      </button>
-                  </div>
-
-                  {/* Debate Translator Box (Hacker Terminal Aesthetic) */}
-                  <div className={`mt-6 bg-[#0d1117] border border-[#30363d] rounded-xl overflow-hidden shadow-2xl transition-all duration-500 ${isGenerating || terminalLogs.length > 1 ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0'}`}>
-                     <div className="bg-[#161b22] border-b border-[#30363d] px-4 py-2 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                           <Terminal className="w-4 h-4 text-[#3fb950]" />
-                           <span className="text-xs font-mono text-[#8b949e]">ide-architect@local:~/workspace</span>
-                        </div>
-                        <div className="flex gap-1.5">
-                           <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
-                           <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
-                           <div className="w-3 h-3 rounded-full bg-[#27c93f]"></div>
-                        </div>
-                     </div>
-                     <div className="p-4 flex flex-col gap-1 max-h-60 overflow-y-auto custom-scrollbar font-mono text-sm">
-                        {terminalLogs.map((log, i) => {
-                           let text = log.replace('> ', '');
-                           let prefix = "[INFO]";
-                           let colorClass = "text-[#8b949e]";
-                           
-                           if (text.includes('Initializing')) { prefix = "[INIT]"; colorClass = "text-[#58a6ff]"; }
-                           if (text.includes('Gemini')) { prefix = "[DRAFT]"; colorClass = "text-[#d2a8ff]"; }
-                           if (text.includes('Claude')) { prefix = "[CRITIQUE]"; colorClass = "text-[#ff7b72]"; }
-                           if (text.includes('DeepSeek') || text.includes('Compiler')) { prefix = "[COMPILE]"; colorClass = "text-[#3fb950]"; }
-                           if (text.includes('Security')) { prefix = "[AUDIT]"; colorClass = "text-[#f0883e]"; }
-                           if (text.includes('complete')) { prefix = "[SUCCESS]"; colorClass = "text-[#3fb950] font-bold"; }
-                           if (text.toLowerCase().includes('local') || text.toLowerCase().includes('ollama')) { prefix = "[LOCAL]"; colorClass = "text-amber-400"; }
-                           if (text.toLowerCase().includes('refinement')) { prefix = "[REFINE]"; colorClass = "text-cyan-400"; }
-                           if (text.toLowerCase().includes('error') || text.toLowerCase().includes('fail')) { prefix = "[ERROR]"; colorClass = "text-red-500 font-bold"; }
-                           
-                           return (
-                             <div key={i} className="animate-fade-in flex gap-3">
-                                <span className={colorClass}>{prefix}</span>
-                                <span className="text-[#c9d1d9]">{text}</span>
-                             </div>
-                           );
-                        })}
-                        {isGenerating && (
-                           <div className="flex gap-3 mt-1">
-                              <span className="text-[#8b949e] animate-pulse">_</span>
-                           </div>
-                        )}
+                     
+                     {/* Debate Translator Box (Hacker Terminal Aesthetic) */}
+                     <div className="flex-1 ml-4">
+                        <ReactErrorBoundary fallback={<div className="p-4 text-red-500">Terminal crashed</div>}>
+                           <TerminalLogViewer logs={terminalLogs} isGenerating={isGenerating} />
+                        </ReactErrorBoundary>
                      </div>
                   </div>
                 </div>
@@ -1560,7 +1626,7 @@ ${vuln.correctedCode}
                                  </h3>
                               </div>
                               <div className="scale-[0.55] origin-top-left overflow-hidden pointer-events-none opacity-90 h-[160px] group-hover:opacity-100 transition-all px-4">
-                                 <MermaidDiagram chart={mermaidCode} />
+                                 <ReactErrorBoundary fallback={<div className="text-red-500 p-4 border border-red-500/30 bg-red-500/10 rounded-lg text-sm">Mermaid crashed!</div>}><MermaidRenderer chart={mermaidCode} /></ReactErrorBoundary>
                               </div>
                               {/* Gradient overlay with CTA */}
                               <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-input)] via-transparent to-transparent flex items-end justify-center pb-3 group-hover:from-[var(--bg-input)]/70 transition-all duration-300">
