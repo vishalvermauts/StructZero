@@ -79,3 +79,18 @@ body {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: var(--text-secondary);
 }
+
+/* AG Grid custom theme override */
+.ag-theme-alpine, .ag-theme-alpine-dark {
+  --ag-background-color: var(--bg-card);
+  --ag-header-background-color: var(--bg-input);
+  --ag-odd-row-background-color: var(--bg-card);
+  --ag-border-color: var(--border-color);
+  --ag-row-border-color: var(--border-color);
+  --ag-header-foreground-color: var(--text-secondary);
+  --ag-data-color: var(--text-primary);
+  --ag-row-hover-color: var(--bg-input);
+  --ag-font-family: var(--font-sans);
+}
+
+input[type="date"] { color-scheme: dark; } :root[data-theme="light"] input[type="date"] { color-scheme: light; }

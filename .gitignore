@@ -1,4 +1,38 @@
+# Dependencies
 node_modules/
 dist/
-*.sqlite
+build/
+
+# Environment variables - NEVER commit this
 .env
+*.env
+.env.local
+.env.production
+
+# Database (contains user data)
+backend/*.sqlite
+backend/*.db
+
+# Generated architecture files (runtime)
+backend/architecture.md
+backend/checkpoint.json
+backend/skills_export/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Vite build
+frontend/dist/
+
+ide-architect-mcp/
+mcp_output_task1.md

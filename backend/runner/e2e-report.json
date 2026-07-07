@@ -1,0 +1,112 @@
+{
+  "timestamp": "2026-07-05T19:04:13.161Z",
+  "tests": [
+    {
+      "name": "Authentication & Login",
+      "status": "PASS",
+      "detail": "Dashboard loaded with navigation",
+      "time": "2026-07-05T19:04:19.014Z"
+    },
+    {
+      "name": "Save Settings Button Exists",
+      "status": "PASS",
+      "detail": "\"Save API Configuration\" found",
+      "time": "2026-07-05T19:04:19.940Z"
+    },
+    {
+      "name": "Architect Prompt Textarea",
+      "status": "PASS",
+      "detail": "",
+      "time": "2026-07-05T19:04:20.763Z"
+    },
+    {
+      "name": "Prompt Text Entered",
+      "status": "PASS",
+      "detail": "Project Zeus: Build a task management system. Must use PostgreSQL. No MongoDB.",
+      "time": "2026-07-05T19:04:20.823Z"
+    },
+    {
+      "name": "Generate Blueprint Button Exists",
+      "status": "PASS",
+      "detail": "Button text: \"Generate Blueprint\"",
+      "time": "2026-07-05T19:04:20.825Z"
+    },
+    {
+      "name": "Backend Server Running",
+      "status": "PASS",
+      "detail": "Status: ok",
+      "time": "2026-07-05T19:04:20.887Z"
+    },
+    {
+      "name": "Lean Mode Enabled for Speed",
+      "status": "PASS",
+      "detail": "Skipping DeepSeek round 3",
+      "time": "2026-07-05T19:04:20.963Z"
+    },
+    {
+      "name": "Architecture Generation Completed",
+      "status": "FAIL",
+      "detail": "No output after 120s - DeepSeek may be rate-limited. Try enabling Lean Mode in Settings.",
+      "time": "2026-07-05T19:06:21.175Z"
+    },
+    {
+      "name": "Mermaid Diagram Rendered",
+      "status": "FAIL",
+      "detail": "No SVG or error found in .mermaid-container",
+      "time": "2026-07-05T19:06:25.312Z"
+    },
+    {
+      "name": "Copy (Markdown) Button Visible",
+      "status": "FAIL",
+      "detail": "Not found - may only appear after generation",
+      "time": "2026-07-05T19:06:25.316Z"
+    },
+    {
+      "name": "Project Name \"Project Zeus\" Visible",
+      "status": "PASS",
+      "detail": "",
+      "time": "2026-07-05T19:06:25.318Z"
+    },
+    {
+      "name": "Security Center Tab Loads",
+      "status": "PASS",
+      "detail": "",
+      "time": "2026-07-05T19:06:26.229Z"
+    },
+    {
+      "name": "Run SAST Scan Button Exists",
+      "status": "PASS",
+      "detail": "",
+      "time": "2026-07-05T19:06:26.232Z"
+    },
+    {
+      "name": "Skills Library Tab Loads",
+      "status": "PASS",
+      "detail": "",
+      "time": "2026-07-05T19:06:27.255Z"
+    },
+    {
+      "name": "Billing Tab Loads",
+      "status": "PASS",
+      "detail": "",
+      "time": "2026-07-05T19:06:29.409Z"
+    },
+    {
+      "name": "Date Pickers Present in Billing",
+      "status": "PASS",
+      "detail": "2 date input(s) found",
+      "time": "2026-07-05T19:06:29.417Z"
+    },
+    {
+      "name": "Documentation Tab Has Content",
+      "status": "PASS",
+      "detail": "6 headings found",
+      "time": "2026-07-05T19:06:31.282Z"
+    }
+  ],
+  "summary": {
+    "passed": 14,
+    "failed": 3,
+    "warnings": 0
+  }
+}

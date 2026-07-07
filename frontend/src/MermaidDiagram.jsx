@@ -5,7 +5,10 @@ import DOMPurify from 'dompurify';
 mermaid.initialize({
   startOnLoad: false,
   theme: 'dark',
-  securityLevel: 'strict',
+  securityLevel: 'loose',
+  flowchart: { useMaxWidth: true, htmlLabels: true },
+  er: { useMaxWidth: true },
+  sequence: { useMaxWidth: true },
 });
 
 const MermaidDiagram = ({ chart, className = '' }) => {
@@ -22,15 +25,11 @@ const MermaidDiagram = ({ chart, className = '' }) => {
     
     const renderDiagram = async () => {
       try {
-        const sanitized = DOMPurify.sanitize(chart, { ALLOWED_TAGS: [] });
-        
-        const { svg } = await mermaid.render(idRef.current, sanitized);
+        // Do not sanitize raw chart string; it destroys Mermaid syntax (<|, etc.)
+        const { svg } = await mermaid.render(idRef.current, chart);
         
         if (mounted && containerRef.current) {
-          const cleanSvg = DOMPurify.sanitize(svg, {
-            USE_PROFILES: { svg: true, svgFilters: true },
-          });
-          containerRef.current.innerHTML = cleanSvg;
+          containerRef.current.innerHTML = svg;
         }
       } catch (error) {
         console.error('Mermaid render failed:', error);

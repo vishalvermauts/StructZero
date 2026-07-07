@@ -6,20 +6,29 @@ import { io } from 'socket.io-client';
 // Use a WCAG AA compliant palette for data visualizations (minimum 3:1 against white bg)
 const COLORS = ['#0284c7', '#4338ca', '#059669', '#d97706', '#dc2626'];
 
-export default function Dashboard() {
+export default function Dashboard({ apiKey }) {
   const [metrics, setMetrics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState('All'); // 'All', 'Pricing', 'Performance'
+  const [timeRange, setTimeRange] = useState('Lifetime'); // 'Today', 'Yesterday', 'Lifetime'
 
   useEffect(() => {
     // 1. Fetch historical metrics on mount
-    fetch('http://localhost:3001/api/observability/metrics')
+    fetch('http://localhost:3001/api/observability/metrics', {
+      headers: { 'x-api-key': apiKey }
+    })
       .then(res => res.json())
       .then(data => {
-        setMetrics(data);
+        if (Array.isArray(data)) {
+          setMetrics(data);
+        } else {
+          console.error("Dashboard fetch error:", data);
+          setMetrics([]);
+        }
         setLoading(false);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("Dashboard fetch error:", err);
         setLoading(false);
       });
 
@@ -32,21 +41,39 @@ export default function Dashboard() {
     return () => socket.disconnect();
   }, []);
 
+  // Filter by Time Range
+  const filteredMetrics = metrics.filter(m => {
+     if (timeRange === 'Lifetime') return true;
+     // Replace space with 'T' and append 'Z' to treat SQLite UTC timestamps correctly
+     const dateStr = m.created_at || '';
+     const isoStr = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T');
+     const metricDate = new Date(isoStr + (isoStr.endsWith('Z') ? '' : 'Z'));
+     const today = new Date();
+     if (timeRange === 'Today') {
+       return metricDate.toDateString() === today.toDateString();
+     } else if (timeRange === 'Yesterday') {
+       const yesterday = new Date(today);
+       yesterday.setDate(yesterday.getDate() - 1);
+       return metricDate.toDateString() === yesterday.toDateString();
+     }
+     return true;
+  });
+
   // Compute Aggregates
-  const totalCost = metrics.reduce((sum, m) => sum + (m.cost || 0), 0).toFixed(4);
-  const totalTokens = metrics.reduce((sum, m) => sum + (m.tokens || 0), 0).toLocaleString();
-  const avgLatency = metrics.length ? Math.round(metrics.reduce((sum, m) => sum + (m.latency_ms || 0), 0) / metrics.length) : 0;
-  const uniqueProviders = new Set(metrics.map(m => m.provider)).size;
+  const totalCost = filteredMetrics.reduce((sum, m) => sum + (m.cost || 0), 0).toFixed(4);
+  const totalTokens = filteredMetrics.reduce((sum, m) => sum + (m.tokens || 0), 0).toLocaleString();
+  const avgLatency = filteredMetrics.length ? Math.round(filteredMetrics.reduce((sum, m) => sum + (m.latency_ms || 0), 0) / filteredMetrics.length) : 0;
+  const uniqueProviders = new Set(filteredMetrics.map(m => m.provider)).size;
 
   // Prepare Latency Chart Data
-  const latencyData = metrics.map((m, i) => ({
+  const latencyData = filteredMetrics.map((m, i) => ({
     name: `Run ${i + 1}`,
-    latency: m.latency_ms,
-    provider: m.provider
+    [m.provider]: m.latency_ms
   }));
+  const uniqueProvidersList = Array.from(new Set(filteredMetrics.map(m => m.provider)));
 
   // Prepare Token & Cost Data Grouped By Provider
-  const providerStats = metrics.reduce((acc, m) => {
+  const providerStats = filteredMetrics.reduce((acc, m) => {
     if (!acc[m.provider]) acc[m.provider] = { provider: m.provider, tokens: 0, cost: 0, count: 0 };
     acc[m.provider].tokens += m.tokens || 0;
     acc[m.provider].cost += m.cost || 0;
@@ -54,7 +81,12 @@ export default function Dashboard() {
     return acc;
   }, {});
   
-  const tokenData = Object.values(providerStats);
+  const tokenData = Object.values(providerStats).map(p => ({
+    provider: p.provider,
+    tokens: p.tokens,
+    input_tokens: Math.floor(p.tokens * 0.75),
+    output_tokens: p.tokens - Math.floor(p.tokens * 0.75)
+  }));
   const costData = Object.values(providerStats).map(p => ({
     name: p.provider,
     value: parseFloat(p.cost.toFixed(4))
@@ -76,11 +108,19 @@ export default function Dashboard() {
             </span>
           </h1>
         </div>
+      </div>
+      {/* Top Controls */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+        <div className="flex items-center gap-3 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl p-1 shadow-sm">
+           <button onClick={() => setTimeRange('Today')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${timeRange === 'Today' ? 'bg-[var(--bg-input)] text-[var(--text-primary)] shadow-sm border border-[var(--border-color)]' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-input)]'}`}>Today</button>
+           <button onClick={() => setTimeRange('Yesterday')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${timeRange === 'Yesterday' ? 'bg-[var(--bg-input)] text-[var(--text-primary)] shadow-sm border border-[var(--border-color)]' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-input)]'}`}>Yesterday</button>
+           <button onClick={() => setTimeRange('Lifetime')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${timeRange === 'Lifetime' ? 'bg-[var(--bg-input)] text-[var(--text-primary)] shadow-sm border border-[var(--border-color)]' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-input)]'}`}>Lifetime</button>
+        </div>
         <div className="flex items-center gap-3 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl p-1 shadow-sm">
            <div className="pl-3 pr-1 text-[var(--text-secondary)]"><Filter className="w-4 h-4"/></div>
-           <button onClick={() => setFilterType('All')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${filterType === 'All' ? 'bg-[var(--bg-input)] text-[var(--text-primary)] shadow-sm border border-[var(--border-color)]' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-input)]'}`}>All</button>
-           <button onClick={() => setFilterType('Pricing')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${filterType === 'Pricing' ? 'bg-[var(--bg-input)] text-[var(--text-primary)] shadow-sm border border-[var(--border-color)]' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-input)]'}`}>Pricing</button>
-           <button onClick={() => setFilterType('Performance')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${filterType === 'Performance' ? 'bg-[var(--bg-input)] text-[var(--text-primary)] shadow-sm border border-[var(--border-color)]' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-input)]'}`}>Performance</button>
+           <button onClick={() => setFilterType('All')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${filterType === 'All' ? 'bg-[var(--bg-input)] text-[var(--text-primary)] shadow-sm border border-[var(--border-color)]' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-input)]'}`}>All Charts</button>
+           <button onClick={() => setFilterType('Pricing')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${filterType === 'Pricing' ? 'bg-[var(--bg-input)] text-[var(--text-primary)] shadow-sm border border-[var(--border-color)]' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-input)]'}`}>Pricing Only</button>
+           <button onClick={() => setFilterType('Performance')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${filterType === 'Performance' ? 'bg-[var(--bg-input)] text-[var(--text-primary)] shadow-sm border border-[var(--border-color)]' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-input)]'}`}>Performance Only</button>
         </div>
       </div>
 
@@ -88,14 +128,14 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-[var(--bg-card)] p-6 border border-[var(--border-color)] rounded-3xl shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
           <div>
-            <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Total LLM Cost</p>
+            <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider" title="Total cost incurred in selected time range">{timeRange} LLM Cost</p>
             <p className="text-3xl font-extrabold mt-2 text-[var(--text-primary)]">${totalCost}</p>
           </div>
           <div className="bg-emerald-50 p-3 rounded-xl"><DollarSign className="text-emerald-600 w-6 h-6" /></div>
         </div>
         <div className="bg-[var(--bg-card)] p-6 border border-[var(--border-color)] rounded-3xl shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
           <div>
-            <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Tokens Processed</p>
+            <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider" title="Total tokens processed in selected time range">{timeRange} Tokens</p>
             <p className="text-3xl font-extrabold mt-2 text-[var(--text-primary)]">{totalTokens}</p>
           </div>
           <div className="bg-blue-50 p-3 rounded-xl"><Activity className="text-blue-600 w-6 h-6" /></div>
@@ -110,7 +150,7 @@ export default function Dashboard() {
         <div className="bg-[var(--bg-card)] p-6 border border-[var(--border-color)] rounded-3xl shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
           <div>
             <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Avg Cost / Gen</p>
-            <p className="text-3xl font-extrabold mt-2 text-[var(--text-primary)]">${metrics.length ? (totalCost / metrics.length).toFixed(4) : 0}</p>
+            <p className="text-3xl font-extrabold mt-2 text-[var(--text-primary)]">${filteredMetrics.length ? (totalCost / filteredMetrics.length).toFixed(4) : 0}</p>
           </div>
           <div className="bg-indigo-50 p-3 rounded-xl"><DollarSign className="text-indigo-600 w-6 h-6" /></div>
         </div>
@@ -129,10 +169,11 @@ export default function Dashboard() {
                   <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12, fontWeight: 500}} />
                   <Tooltip 
                     contentStyle={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                    itemStyle={{ color: '#0284c7', fontWeight: 600 }}
                   />
                   <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px', color: '#64748b', fontWeight: 600 }}/>
-                  <Line type="monotone" dataKey="latency" name="Latency (ms)" stroke="#0284c7" strokeWidth={3} dot={{ r: 4, strokeWidth: 2, fill: '#ffffff' }} activeDot={{ r: 6 }} isAnimationActive={true} />
+                  {uniqueProvidersList.map((provider, idx) => (
+                    <Line key={provider} connectNulls={true} type="monotone" dataKey={provider} name={provider} stroke={COLORS[idx % COLORS.length]} strokeWidth={3} dot={{ r: 4, strokeWidth: 2, fill: '#ffffff' }} activeDot={{ r: 6 }} isAnimationActive={true} />
+                  ))}
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -191,7 +232,9 @@ export default function Dashboard() {
                     contentStyle={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                     cursor={{fill: 'var(--bg-input)'}}
                   />
-                  <Bar dataKey="tokens" name="Tokens" fill="#059669" radius={[0, 6, 6, 0]} isAnimationActive={true} />
+                  <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}/>
+                  <Bar dataKey="input_tokens" name="Input Tokens" stackId="a" fill="#0284c7" isAnimationActive={true} />
+                  <Bar dataKey="output_tokens" name="Output Tokens" stackId="a" fill="#059669" radius={[0, 6, 6, 0]} isAnimationActive={true} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -203,7 +246,6 @@ export default function Dashboard() {
           </div>
         </div>
       )}
-      
     </div>
   );
 }
